@@ -9,6 +9,7 @@ interface IProps {
   post: IPost | null;
   createPost: (post: IPost) => void;
   editPost: (post: IPost) => void;
+  submitting: boolean;
 }
 
 const PostForm: React.FC<IProps> = ({
@@ -16,6 +17,7 @@ const PostForm: React.FC<IProps> = ({
   post: initialFormState,
   createPost,
   editPost,
+  submitting,
 }) => {
   const initializeForm = () => {
     if (initialFormState) {
@@ -95,7 +97,13 @@ const PostForm: React.FC<IProps> = ({
           placeholder="Venue"
           value={post.venue}
         />
-        <Button floated="right" positive type="submit" content="Submit" />
+        <Button
+          loading={submitting}
+          floated="right"
+          positive
+          type="submit"
+          content="Submit"
+        />
         <Button
           onClick={() => setEditMode(false)}
           floated="right"
