@@ -1,24 +1,18 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useContext, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
+import { observer } from "mobx-react-lite";
 
 import { IPost } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
+import PostStore from "../../../app/stores/postStore";
 
 interface IProps {
-  setEditMode: (editMode: boolean) => void;
-  post: IPost | null;
-  createPost: (post: IPost) => void;
-  editPost: (post: IPost) => void;
-  submitting: boolean;
+  post: IPost;
 }
 
-const PostForm: React.FC<IProps> = ({
-  setEditMode,
-  post: initialFormState,
-  createPost,
-  editPost,
-  submitting,
-}) => {
+const PostForm: React.FC<IProps> = ({ post: initialFormState }) => {
+  const postStore = useContext(PostStore);
+  const { createPost, editPost, submitting, cancelOpenForm } = postStore;
   const initializeForm = () => {
     if (initialFormState) {
       return initialFormState;
@@ -105,7 +99,7 @@ const PostForm: React.FC<IProps> = ({
           content="Submit"
         />
         <Button
-          onClick={() => setEditMode(false)}
+          onClick={cancelOpenForm}
           floated="right"
           type="submit"
           content="Cancel"
@@ -115,4 +109,4 @@ const PostForm: React.FC<IProps> = ({
   );
 };
 
-export default PostForm;
+export default observer(PostForm);
