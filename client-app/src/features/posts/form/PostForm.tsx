@@ -1,35 +1,51 @@
-import React, { FormEvent, useContext, useState } from "react";
+import React, { FormEvent, useContext, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 
 import { IPost } from "../../../app/models/post";
 import { v4 as uuid } from "uuid";
 import PostStore from "../../../app/stores/postStore";
+import { RouteComponentProps } from "react-router-dom";
 
-interface IProps {
-  post: IPost;
+interface DetailParams {
+  id: string;
 }
 
-const PostForm: React.FC<IProps> = ({ post: initialFormState }) => {
+const PostForm: React.FC<RouteComponentProps<DetailParams>> = ({
+  match,
+  history,
+}) => {
   const postStore = useContext(PostStore);
-  const { createPost, editPost, submitting, cancelOpenForm } = postStore;
-  const initializeForm = () => {
-    if (initialFormState) {
-      return initialFormState;
-    } else {
-      return {
-        id: "",
-        title: "",
-        category: "",
-        description: "",
-        date: "",
-        city: "",
-        venue: "",
-      };
-    }
-  };
+  const {
+    createPost,
+    editPost,
+    submitting,
+    post: initialFormState,
+    loadPost,
+    clearPost,
+  } = postStore;
 
-  const [post, setPost] = useState<IPost>(initializeForm);
+  const [post, setPost] = useState<IPost>({
+    id: "",
+    title: "",
+    category: "",
+    description: "",
+    date: "",
+    city: "",
+    venue: "",
+  });
+
+  useEffect(() => {
+    if (match.params.id && post.id.length === 0) {
+      loadPost(match.params.id).then(
+        () => initialFormState && setPost(initialFormState)
+      );
+    }
+
+    return () => {
+      clearPost();
+    };
+  }, [loadPost, match.params.id, clearPost, initialFormState, post.id.length]);
 
   const handleSubmit = () => {
     if (post.id.length === 0) {
@@ -38,9 +54,9 @@ const PostForm: React.FC<IProps> = ({ post: initialFormState }) => {
         id: uuid(),
       };
 
-      createPost(newPost);
+      createPost(newPost).then(() => history.push(`/posts/${newPost.id}`));
     } else {
-      editPost(post);
+      editPost(post).then(() => history.push(`/posts/${post.id}`));
     }
   };
 
@@ -99,9 +115,9 @@ const PostForm: React.FC<IProps> = ({ post: initialFormState }) => {
           content="Submit"
         />
         <Button
-          onClick={cancelOpenForm}
+          onClick={() => history.push("/posts")}
           floated="right"
-          type="submit"
+          type="button"
           content="Cancel"
         />
       </Form>

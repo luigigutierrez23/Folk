@@ -1,12 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { Button, Card, Image } from "semantic-ui-react";
+import { Link, RouteComponentProps } from "react-router-dom";
 
 import PostStore from "../../../app/stores/postStore";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
-const PostDetails: React.FC = () => {
+interface DetailParams {
+  id: string;
+}
+
+const PostDetails: React.FC<RouteComponentProps<DetailParams>> = ({
+  match,
+  history,
+}) => {
   const postStore = useContext(PostStore);
-  const { selectedPost: post, openEditForm, cancelSelectedPost } = postStore;
+  const { post, loadPost, loadingInitial } = postStore;
+
+  useEffect(() => {
+    loadPost(match.params.id);
+  }, [loadPost, match.params.id]);
+
+  if (loadingInitial || !post)
+    return <LoadingComponent inverted={true} content="Loading post..." />;
+
   return (
     <Card fluid>
       <Image
@@ -24,13 +41,14 @@ const PostDetails: React.FC = () => {
       <Card.Content extra>
         <Button.Group widths={2}>
           <Button
-            onClick={() => openEditForm(post!.id)}
+            as={Link}
+            to={`/manage/${post.id}`}
             basic
             color="blue"
             content="Edit"
           />
           <Button
-            onClick={cancelSelectedPost}
+            onClick={() => history.push("/posts")}
             basic
             color="grey"
             content="Cancel"

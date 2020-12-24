@@ -9,10 +9,8 @@ configure({ enforceActions: "always" });
 
 class PostStore {
   @observable postRegistry = new Map();
-  @observable posts: IPost[] = [];
-  @observable selectedPost: IPost | undefined = undefined;
+  @observable post: IPost | null = null;
   @observable loadingInitial = false;
-  @observable editMode = false;
   @observable submitting = false;
   @observable target = "";
 
@@ -41,13 +39,42 @@ class PostStore {
     }
   };
 
+  @action loadPost = async (id: string) => {
+    let post = this.getPost(id);
+
+    if (post) {
+      this.post = post;
+    } else {
+      this.loadingInitial = true;
+      try {
+        post = await agent.Posts.details(id);
+        runInAction("Getting post", () => {
+          this.post = post;
+          this.loadingInitial = false;
+        });
+      } catch (err) {
+        runInAction("Get post error", () => {
+          this.loadingInitial = false;
+        });
+        console.error(err);
+      }
+    }
+  };
+
+  @action clearPost = () => {
+    this.post = null;
+  };
+
+  getPost = (id: string) => {
+    return this.postRegistry.get(id);
+  };
+
   @action createPost = async (post: IPost) => {
     this.submitting = true;
     try {
       await agent.Posts.create(post);
       runInAction("Create new post", () => {
         this.postRegistry.set(post.id, post);
-        this.editMode = false;
         this.submitting = false;
       });
     } catch (err) {
@@ -64,8 +91,7 @@ class PostStore {
       await agent.Posts.update(post);
       runInAction("Edit post", () => {
         this.postRegistry.set(post.id, post);
-        this.selectedPost = post;
-        this.editMode = false;
+        this.post = post;
         this.submitting = false;
       });
     } catch (err) {
@@ -97,29 +123,6 @@ class PostStore {
       });
       console.error(err);
     }
-  };
-
-  @action openCreateForm = () => {
-    this.editMode = true;
-    this.selectedPost = undefined;
-  };
-
-  @action openEditForm = (id: string) => {
-    this.selectedPost = this.postRegistry.get(id);
-    this.editMode = true;
-  };
-
-  @action cancelSelectedPost = () => {
-    this.selectedPost = undefined;
-  };
-
-  @action cancelOpenForm = () => {
-    this.editMode = false;
-  };
-
-  @action selectPost = (id: string) => {
-    this.selectedPost = this.postRegistry.get(id);
-    this.editMode = false;
   };
 }
 
