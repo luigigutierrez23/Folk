@@ -1,5 +1,5 @@
 import React, { FormEvent, useContext, useEffect, useState } from "react";
-import { Button, Form, Segment } from "semantic-ui-react";
+import { Button, Form, Grid, Segment } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 
 import { IPost } from "../../../app/models/post";
@@ -68,60 +68,64 @@ const PostForm: React.FC<RouteComponentProps<DetailParams>> = ({
   };
 
   return (
-    <Segment clearing>
-      <Form onSubmit={handleSubmit}>
-        <Form.Input
-          onChange={handleInputChange}
-          name="title"
-          placeholder="Title"
-          value={post.title}
-        />
-        <Form.TextArea
-          onChange={handleInputChange}
-          name="description"
-          placeholder="Description"
-          value={post.description}
-        />
-        <Form.Input
-          onChange={handleInputChange}
-          name="category"
-          placeholder="Category"
-          value={post.category}
-        />
-        <Form.Input
-          onChange={handleInputChange}
-          name="date"
-          type="datetime-local"
-          placeholder="Date"
-          value={post.date}
-        />
-        <Form.Input
-          onChange={handleInputChange}
-          name="city"
-          placeholder="City"
-          value={post.city}
-        />
-        <Form.Input
-          onChange={handleInputChange}
-          name="venue"
-          placeholder="Venue"
-          value={post.venue}
-        />
-        <Button
-          loading={submitting}
-          floated="right"
-          positive
-          type="submit"
-          content="Submit"
-        />
-        <Button
-          onClick={() => history.push("/posts")}
-          floated="right"
-          type="button"
-          content="Cancel"
-        />
-      </Form>
-    </Segment>
+    <Grid>
+      <Grid.Column width={10}>
+        <Segment clearing>
+          <Form onSubmit={handleSubmit}>
+            <Form.Input
+              onChange={handleInputChange}
+              name="title"
+              placeholder="Title"
+              value={post.title}
+            />
+            <Form.TextArea
+              onChange={handleInputChange}
+              name="description"
+              placeholder="Description"
+              value={post.description}
+            />
+            <Form.Input
+              onChange={handleInputChange}
+              name="category"
+              placeholder="Category"
+              value={post.category}
+            />
+            <Form.Input
+              onChange={handleInputChange}
+              name="date"
+              type="datetime-local"
+              placeholder="Date"
+              value={post.date}
+            />
+            <Form.Input
+              onChange={handleInputChange}
+              name="city"
+              placeholder="City"
+              value={post.city}
+            />
+            <Form.Input
+              onChange={handleInputChange}
+              name="venue"
+              placeholder="Venue"
+              value={post.venue}
+            />
+            <Button
+              loading={submitting}
+              floated="right"
+              positive
+              type="submit"
+              content="Submit"
+            />
+            <Button
+              onClick={() => history.push("/posts")}
+              floated="right"
+              type="button"
+              content="Cancel"
+            />
+          </Form>
+        </Segment>
+      </Grid.Column>
+    </Grid>
   );
 };
 
