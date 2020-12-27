@@ -1,6 +1,8 @@
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Errors;
 using Domain;
 using MediatR;
 using Persistence;
@@ -24,7 +26,13 @@ namespace Application.Posts
 
             public async Task<Post> Handle(Query request, CancellationToken cancellationToken)
             {
+
                 var post = await _context.Posts.FindAsync(request.Id);
+
+                if (post == null)
+                {
+                    throw new RestException(HttpStatusCode.NotFound, new { Post = "Not found" });
+                }
 
                 return post;
             }

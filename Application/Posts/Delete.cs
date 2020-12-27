@@ -1,6 +1,8 @@
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Errors;
 using MediatR;
 using Persistence;
 
@@ -27,7 +29,7 @@ namespace Application.Posts
 
                 if (post == null)
                 {
-                    throw new Exception("Could not find post");
+                    throw new RestException(HttpStatusCode.NotFound, new { Post = "Not found" });
                 }
 
                 _context.Remove(post);

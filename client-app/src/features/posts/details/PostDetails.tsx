@@ -16,16 +16,19 @@ interface DetailParams {
 
 const PostDetails: React.FC<RouteComponentProps<DetailParams>> = ({
   match,
+  history,
 }) => {
   const postStore = useContext(PostStore);
   const { post, loadPost, loadingInitial } = postStore;
 
   useEffect(() => {
     loadPost(match.params.id);
-  }, [loadPost, match.params.id]);
+  }, [loadPost, match.params.id, history]);
 
-  if (loadingInitial || !post)
+  if (loadingInitial)
     return <LoadingComponent inverted={true} content="Loading post..." />;
+
+  if (!post) return <h2>Post not found</h2>;
 
   return (
     <Grid>
