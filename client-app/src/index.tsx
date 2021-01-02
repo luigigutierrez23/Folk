@@ -3,11 +3,14 @@ import ReactDOM from "react-dom";
 import { Router } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import "react-toastify/dist/ReactToastify.min.css";
-import { BrowserRouter } from "react-router-dom";
+import "react-widgets/dist/css/react-widgets.css";
 import "./app/layout/style.css";
 import App from "./app/layout/App";
 import reportWebVitals from "./reportWebVitals";
 import ScrollToTop from "./app/layout/ScrollTop";
+import dateFnsLocalizer from "react-widgets-date-fns";
+
+dateFnsLocalizer();
 
 export const history = createBrowserHistory();
 

@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Icon, Item, Segment } from "semantic-ui-react";
+import { format } from "date-fns";
+
 import { IPost } from "../../../app/models/post";
 
 const PostListItem: React.FC<{ post: IPost }> = ({ post }) => {
@@ -18,7 +20,7 @@ const PostListItem: React.FC<{ post: IPost }> = ({ post }) => {
         </Item.Group>
       </Segment>
       <Segment>
-        <Icon name="clock" /> {post.date}
+        <Icon name="clock" /> {format(post.date, "h:mm a")}
         <Icon name="marker" /> {post.venue},{post.city}
       </Segment>
       <Segment secondary>Attendes will go here</Segment>

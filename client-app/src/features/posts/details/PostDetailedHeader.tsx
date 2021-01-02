@@ -1,6 +1,9 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
+import { Link } from "react-router-dom";
 import { Button, Header, Image, Item, Segment } from "semantic-ui-react";
+import { format } from "date-fns";
+
 import { IPost } from "../../../app/models/post";
 
 const postImageStyle = {
@@ -34,7 +37,7 @@ const PostDetailedHeader: React.FC<{ post: IPost }> = ({ post }) => {
                   content={post.title}
                   style={{ color: "white" }}
                 />
-                <p>{post.date}</p>
+                <p>{format(post.date, "eeee do MMMM")}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>
@@ -46,7 +49,12 @@ const PostDetailedHeader: React.FC<{ post: IPost }> = ({ post }) => {
       <Segment clearing attached="bottom">
         <Button color="teal">Join Activity</Button>
         <Button>Cancel attendance</Button>
-        <Button color="orange" floated="right">
+        <Button
+          as={Link}
+          to={`/manage/${post.id}`}
+          color="orange"
+          floated="right"
+        >
           Manage Event
         </Button>
       </Segment>

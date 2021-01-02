@@ -4,6 +4,8 @@ import "mobx-react-lite/batchingForReactDom";
 
 import agent from "../api/agent";
 import { IPost } from "../models/post";
+import { history } from "../..";
+import { toast } from "react-toastify";
 
 configure({ enforceActions: "always" });
 
@@ -20,11 +22,11 @@ class PostStore {
 
   groupPostsByDate(posts: IPost[]) {
     const sortedPosts = posts.sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date.getTime() - b.date.getTime()
     );
     return Object.entries(
       sortedPosts.reduce((posts, post) => {
-        const date = post.date.split("T")[0];
+        const date = post.date.toISOString().split("T")[0];
         posts[date] = posts[date] ? [...posts[date], post] : [post];
         return posts;
       }, {} as { [key: string]: IPost[] })
@@ -37,7 +39,7 @@ class PostStore {
       const posts = await agent.Posts.list();
       runInAction("loading posts", () => {
         posts.forEach((post) => {
-          post.date = post.date.split(".")[0];
+          post.date = new Date(post.date);
           this.postRegistry.set(post.id, post);
         });
         this.loadingInitial = false;
@@ -55,14 +57,18 @@ class PostStore {
 
     if (post) {
       this.post = post;
+      return post;
     } else {
       this.loadingInitial = true;
       try {
         post = await agent.Posts.details(id);
         runInAction("Getting post", () => {
+          post.date = new Date(post.date);
           this.post = post;
+          this.postRegistry.set(post.id, post);
           this.loadingInitial = false;
         });
+        return post;
       } catch (err) {
         runInAction("Get post error", () => {
           this.loadingInitial = false;
@@ -88,11 +94,13 @@ class PostStore {
         this.postRegistry.set(post.id, post);
         this.submitting = false;
       });
+      history.push(`/posts/${post.id}`);
     } catch (err) {
       runInAction("Create new post error", () => {
         this.submitting = false;
       });
-      console.error(err);
+      toast.error("Problem submitting data");
+      console.error(err.response);
     }
   };
 
@@ -105,11 +113,13 @@ class PostStore {
         this.post = post;
         this.submitting = false;
       });
+      history.push(`/posts/${post.id}`);
     } catch (err) {
       runInAction("Edit post error", () => {
         this.submitting = false;
       });
-      console.error(err);
+      toast.error("Problem submitting data");
+      console.error(err.response);
     }
   };
 
