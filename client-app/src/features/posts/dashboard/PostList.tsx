@@ -2,12 +2,12 @@ import React, { Fragment, useContext } from "react";
 import { observer } from "mobx-react-lite";
 import { Item, Label } from "semantic-ui-react";
 
-import PostStore from "../../../app/stores/postStore";
 import PostListItem from "./PostListItem";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const PostList: React.FC = () => {
-  const postStore = useContext(PostStore);
-  const { postsByDate } = postStore;
+  const rootStore = useContext(RootStoreContext);
+  const { postsByDate } = rootStore.postStore;
   return (
     <Fragment>
       {postsByDate.map(([group, posts]) => (

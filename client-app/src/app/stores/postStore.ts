@@ -1,15 +1,20 @@
-import { createContext, SyntheticEvent } from "react";
-import { observable, action, computed, configure, runInAction } from "mobx";
+import { SyntheticEvent } from "react";
+import { observable, action, computed, runInAction } from "mobx";
 import "mobx-react-lite/batchingForReactDom";
 
 import agent from "../api/agent";
 import { IPost } from "../models/post";
 import { history } from "../..";
 import { toast } from "react-toastify";
+import { RootStore } from "./rootStore";
 
-configure({ enforceActions: "always" });
+export default class PostStore {
+  rootStore: RootStore;
 
-class PostStore {
+  constructor(rootStore: RootStore) {
+    this.rootStore = rootStore;
+  }
+
   @observable postRegistry = new Map();
   @observable post: IPost | null = null;
   @observable loadingInitial = false;
@@ -146,5 +151,3 @@ class PostStore {
     }
   };
 }
-
-export default createContext(new PostStore());

@@ -4,15 +4,17 @@ import { observer } from "mobx-react-lite";
 
 import PostList from "./PostList";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
-import PostStore from "../../../app/stores/postStore";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const PostDashboard: React.FC = () => {
-  const postStore = useContext(PostStore);
-  useEffect(() => {
-    postStore.loadPosts();
-  }, [postStore]);
+  const rootStore = useContext(RootStoreContext);
+  const { loadPosts, loadingInitial } = rootStore.postStore;
 
-  if (postStore.loadingInitial)
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
+
+  if (loadingInitial)
     return <LoadingComponent inverted={true} content="Loading posts..." />;
   return (
     <Grid>

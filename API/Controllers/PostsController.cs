@@ -13,38 +13,41 @@ namespace API.Controllers
     [ApiController]
     public class PostsController : BaseController
     {
-
-
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Post>>> List()
         {
             return await Mediator.Send(new List.Query());
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
+        // [Authorize]
         public async Task<ActionResult<Post>> Details(Guid id)
         {
             return await Mediator.Send(new Details.Query{Id = id});
         }
 
         [HttpPost]
-        public async Task<ActionResult<Unit>> Create(Create.Command command)
+        [AllowAnonymous]
+        public async Task<IActionResult> Create(Post post)
         {
-            return await Mediator.Send(command);
+            return Ok(await Mediator.Send(new Create.Command { Post = post }));
         }
 
         [HttpPut("{id}")]
-        public async Task <ActionResult<Unit>> Edit(Guid id, Edit.Command command)
+        [AllowAnonymous]
+        public async Task<IActionResult> Edit(Guid id, Post post)
         {
-            command.Id = id;
-            return await Mediator.Send(command);
+            post.Id = id;
+            return Ok(await Mediator.Send(new Edit.Command { Post = post }));
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Unit>> Delete(Guid id)
+        [AllowAnonymous]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            return await Mediator.Send(new Delete.Command{Id = id});
+            return Ok(await Mediator.Send(new Delete.Command{Id = id}));
         }
     }
 }

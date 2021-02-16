@@ -13,12 +13,12 @@ import {
 } from "revalidate";
 
 import { IPostFormValues, PostFormValues } from "../../../app/models/post";
-import PostStore from "../../../app/stores/postStore";
 import TextInput from "../../../app/common/form/TextInput";
 import TextAreaInput from "../../../app/common/form/TextAreaInput";
 import SelectInput from "../../../app/common/form/SelectInput";
 import { category } from "../../../app/common/options/categoryOptions";
 import DateInput from "../../../app/common/form/DateInput";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const validate = combineValidators({
   title: isRequired({ message: "The event title is required" }),
@@ -43,8 +43,8 @@ const PostForm: React.FC<RouteComponentProps<DetailParams>> = ({
   match,
   history,
 }) => {
-  const postStore = useContext(PostStore);
-  const { createPost, editPost, submitting, loadPost } = postStore;
+  const rootStore = useContext(RootStoreContext);
+  const { createPost, editPost, submitting, loadPost } = rootStore.postStore;
 
   const [post, setPost] = useState<IPostFormValues>(new PostFormValues());
   const [loading, setLoading] = useState(false);

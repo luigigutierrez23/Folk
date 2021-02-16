@@ -3,6 +3,8 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Errors;
+using AutoMapper;
+using Domain;
 using FluentValidation;
 using MediatR;
 using Persistence;
@@ -13,55 +15,46 @@ namespace Application.Posts
     {
         public class Command : IRequest
         {
-            public Guid Id { get; set; }
-            public string Title { get; set; }
-            public string Description { get; set; }
-            public string Category { get; set; } 
-            public DateTime? Date { get; set; }
-            public string City { get; set; }
-            public string Venue { get; set; } 
+            public Post Post { get; set; }
         }
 
         public class CommandValidator : AbstractValidator<Command>
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Title).NotEmpty();
-                RuleFor(x => x.Description).NotEmpty();
-                RuleFor(x => x.Category).NotEmpty();
-                RuleFor(x => x.Date).NotEmpty();
-                RuleFor(x => x.City).NotEmpty();
-                RuleFor(x => x.Venue).NotEmpty();
+                RuleFor(x => x.Post.Title).NotEmpty();
+                RuleFor(x => x.Post.Description).NotEmpty();
+                RuleFor(x => x.Post.Category).NotEmpty();
+                RuleFor(x => x.Post.Date).NotEmpty();
+                RuleFor(x => x.Post.City).NotEmpty();
+                RuleFor(x => x.Post.Venue).NotEmpty();
             }
         }
 
         public class Handler : IRequestHandler<Command>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly IMapper _mapper;
+            public Handler(DataContext context, IMapper mapper)
             {
+                _mapper = mapper;
                 _context = context;
             }
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var post  = await _context.Posts.FindAsync(request.Id);
+                var post = await _context.Posts.FindAsync(request.Post.Id);
 
                 if (post == null)
                 {
                     throw new RestException(HttpStatusCode.NotFound, new { Post = "Not found" });
                 }
 
-                post.Title = request.Title ?? post.Title;
-                post.Description = request.Description ?? post.Description;
-                post.Category = request.Category ?? post.Category;
-                post.Date = request.Date ?? post.Date;
-                post.City = request.City ?? post.City;
-                post.Venue = request.Venue ?? post.Venue;
+                _mapper.Map(request.Post, post);
 
                 var success = await _context.SaveChangesAsync() > 0;
 
-                if(success) return Unit.Value;
+                if (success) return Unit.Value;
 
                 throw new Exception("Problem saving changes");
             }

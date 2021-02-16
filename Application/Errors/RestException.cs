@@ -14,4 +14,5 @@ namespace Application.Errors
         public HttpStatusCode Code { get; }
         public object Errors { get; }
     }
+    
 }

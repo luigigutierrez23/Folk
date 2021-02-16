@@ -28,13 +28,13 @@ namespace API.Middleware
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex, _logger);
-                throw;
             }
         }
 
         private async Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger<ErrorHandlingMiddleware> logger)
         {
             object errors = null;
+
             switch (ex)
             {
                 case RestException re:

@@ -3,12 +3,12 @@ import { observer } from "mobx-react-lite";
 import { Grid } from "semantic-ui-react";
 import { RouteComponentProps } from "react-router-dom";
 
-import PostStore from "../../../app/stores/postStore";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
 import PostDetailedHeader from "./PostDetailedHeader";
 import PostDetailedInfo from "./PostDetailedInfo";
 import PostDetailedChat from "./PostDetailedChat";
 import PostDetailedSideBar from "./PostDetailedSideBar";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 interface DetailParams {
   id: string;
@@ -18,8 +18,8 @@ const PostDetails: React.FC<RouteComponentProps<DetailParams>> = ({
   match,
   history,
 }) => {
-  const postStore = useContext(PostStore);
-  const { post, loadPost, loadingInitial } = postStore;
+  const rootStore = useContext(RootStoreContext);
+  const { post, loadPost, loadingInitial } = rootStore.postStore;
 
   useEffect(() => {
     loadPost(match.params.id);

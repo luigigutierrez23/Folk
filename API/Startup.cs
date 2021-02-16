@@ -1,5 +1,7 @@
 using System.Text;
+using API.Extensions;
 using API.Middleware;
+using Application.Core;
 using Application.Interfaces;
 using Application.Posts;
 using Domain;
@@ -25,69 +27,47 @@ namespace API
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(opts => 
-            {
-                opts.AddPolicy("CorsPolicy", policy => 
-                {
-                    policy.AllowAnyHeader()
-                    .AllowAnyMethod().WithOrigins("http://localhost:3000");
-                });
-            });
-            //Adding MediatR
-            services.AddMediatR(typeof(List.Handler).Assembly);
-
-            //Db context SQlite
-            services.AddDbContext<DataContext>(opt => {
-                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
-            });
-            services.AddControllers(opt => 
+            services.AddControllers(opt =>
             {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 opt.Filters.Add(new AuthorizeFilter(policy));
             })
                 //Add Fluent Validation
-                .AddFluentValidation(cfg => 
+                .AddFluentValidation(cfg =>
                 {
                     cfg.RegisterValidatorsFromAssemblyContaining<Create>();
                 });
 
-            //Allow Swagger
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            });
+            services.AddApplicationServices(_configuration);
 
-            services.AddSwaggerGen(options =>
-            {
-                options.CustomSchemaIds(type => type.ToString());
-            });
-
+            services.AddRouting();
+            services.AddAuthorization();
+            //Adding MediatR 
+            
             //EntityFramework
             var builder = services.AddIdentityCore<AppUser>();
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identityBuilder.AddEntityFrameworkStores<DataContext>();
             identityBuilder.AddSignInManager<SignInManager<AppUser>>();
-            
+
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccesor, UserAccesor>();
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["TokenKey"]));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt => 
+                .AddJwtBearer(opt =>
                 {
                     opt.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuerSigningKey = true, 
+                        ValidateIssuerSigningKey = true,
                         IssuerSigningKey = key,
                         ValidateAudience = false,
                         ValidateIssuer = false,
@@ -112,14 +92,12 @@ namespace API
 
             app.UseRouting();
             app.UseCors("CorsPolicy");
-
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });            
+            });
         }
     }
 }

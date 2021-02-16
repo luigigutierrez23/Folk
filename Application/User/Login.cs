@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using Domain;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Persistence;
 
 namespace Application.User
 {
@@ -31,7 +29,6 @@ namespace Application.User
 
         public class Handler : IRequestHandler<Query, User>
         {
-            private readonly DataContext _context;
             private readonly UserManager<AppUser> _userManager;
             private readonly SignInManager<AppUser> _signInManager;
             private readonly IJwtGenerator _jwtGenerator;
@@ -50,12 +47,11 @@ namespace Application.User
 
                 if (user == null)
                 {
-                    Console.WriteLine("Antes");
                     throw new RestException(HttpStatusCode.Unauthorized);
                 }
 
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-
+                
                 if (result.Succeeded)
                 {
                     //TODO: generate token
