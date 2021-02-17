@@ -1,13 +1,12 @@
 import React, { Fragment, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Button, Container, Header, Image, Segment } from "semantic-ui-react";
-import { RootStoreContext } from "../../app/stores/rootStore";
+import { useStore } from "../../app/stores/store";
 import LoginForm from "../user/LoginForm";
+import RegisterForm from "../user/RegisterForm";
 
 const HomePage = () => {
-  const rootStore = useContext(RootStoreContext);
-  const { isLoggedIn, user } = rootStore.userStore;
-  const { openModal } = rootStore.modalStore;
+  const { userStore, modalStore } = useStore();
   return (
     <Segment inverted textAlign="center" vertical className="masthead">
       <Container text>
@@ -20,31 +19,31 @@ const HomePage = () => {
           />
           Folk
         </Header>
-        {isLoggedIn && user ? (
-          <Fragment>
-            <Header
-              as="h2"
-              inverted
-              content={`Welcome back ${user.displayName}`}
-            />
+        {userStore.isLoggedIn ? (
+          <>
+            <Header as="h2" inverted content={`Welcome to Folk`} />
             <Button as={Link} to="/posts" size="huge" inverted>
               Go to posts!
             </Button>
-          </Fragment>
+          </>
         ) : (
-          <Fragment>
+          <>
             <Header as="h2" inverted content="Welcome Folker" />
             <Button
-              onClick={() => openModal(<LoginForm />)}
+              onClick={() => modalStore.openModal(<LoginForm />)}
               size="huge"
               inverted
             >
               Login
             </Button>
-            <Button as={Link} to="/register" size="huge" inverted>
+            <Button
+              onClick={() => modalStore.openModal(<RegisterForm />)}
+              size="huge"
+              inverted
+            >
               Register
             </Button>
-          </Fragment>
+          </>
         )}
       </Container>
     </Segment>

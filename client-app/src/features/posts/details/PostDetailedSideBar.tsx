@@ -1,10 +1,11 @@
-import React, { Fragment } from "react";
+import React from "react";
+import { Segment, List, Label, Item, Image } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { Segment, List, Item, Label, Image } from "semantic-ui-react";
+import { observer } from "mobx-react-lite";
 
-const PostDetailedSideBar = () => {
+export default observer(function ActivityDetailedSidebar() {
   return (
-    <Fragment>
+    <>
       <Segment
         textAlign="center"
         style={{ border: "none" }}
@@ -54,8 +55,6 @@ const PostDetailedSideBar = () => {
           </Item>
         </List>
       </Segment>
-    </Fragment>
+    </>
   );
-};
-
-export default PostDetailedSideBar;
+});

@@ -1,9 +1,10 @@
-import React, { Fragment } from "react";
-import { Segment, Header, Form, Button, Comment } from "semantic-ui-react";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import { Segment, Header, Comment, Form, Button } from "semantic-ui-react";
 
-const PostDetailedChat = () => {
+export default observer(function ActivityDetailedChat() {
   return (
-    <Fragment>
+    <>
       <Segment
         textAlign="center"
         attached="top"
@@ -54,8 +55,6 @@ const PostDetailedChat = () => {
           </Form>
         </Comment.Group>
       </Segment>
-    </Fragment>
+    </>
   );
-};
-
-export default PostDetailedChat;
+});

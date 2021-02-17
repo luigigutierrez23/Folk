@@ -1,48 +1,46 @@
-import React, { Fragment, useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Container } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
-import {
-  Route,
-  RouteComponentProps,
-  Switch,
-  withRouter,
-} from "react-router-dom";
+import { Route, Switch, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { useStore } from "../stores/store";
 
-import NavBar from "../../features/nav/NavBar";
+import NavBar from "./NavBar";
 import PostDashboard from "../../features/posts/dashboard/PostDashboard";
 import HomePage from "../../features/home/HomePage";
 import PostForm from "../../features/posts/form/PostForm";
 import PostDetails from "../../features/posts/details/PostDetails";
-import NotFound from "../layout/NotFound";
+import NotFound from "../../features/errors/NotFound";
+import ServerError from "../../features/errors/ServerError";
 import LoginForm from "../../features/user/LoginForm";
-import { RootStoreContext } from "../stores/rootStore";
 import LoadingComponent from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
+import TestErrors from "../../features/errors/TestError";
 
-const App: React.FC<RouteComponentProps> = ({ location }) => {
-  const rootStore = useContext(RootStoreContext);
-  const { setAppLoaded, token, appLoaded } = rootStore.commonStore;
-  const { getUser } = rootStore.userStore;
+function App() {
+  const location = useLocation();
+  const { commonStore, userStore } = useStore();
 
   useEffect(() => {
-    if (token) {
-      getUser().finally(() => setAppLoaded());
+    if (commonStore.token) {
+      userStore.getUser().finally(() => commonStore.setAppLoaded());
     } else {
-      setAppLoaded();
+      commonStore.setAppLoaded();
     }
-  }, [getUser, setAppLoaded, token]);
+  }, [commonStore, userStore]);
 
-  if (!appLoaded) return <LoadingComponent inverted content="Loading app..." />;
+  if (!commonStore.appLoaded)
+    return <LoadingComponent inverted content="Loading app..." />;
+
   return (
-    <Fragment>
+    <>
+      <ToastContainer position="bottom-right" hideProgressBar />
       <ModalContainer />
-      <ToastContainer position="bottom-right" />
       <Route exact path="/" component={HomePage} />
       <Route
         path={"/(.+)"}
         render={() => (
-          <Fragment>
+          <>
             <NavBar />
             <Container style={{ marginTop: "7em" }}>
               <Switch>
@@ -53,15 +51,17 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                   path={["/create-post", "/manage/:id"]}
                   component={PostForm}
                 />
+                <Route path="/errors" component={TestErrors} />
+                <Route path="/server-error" component={ServerError} />
                 <Route path="/login" component={LoginForm} />
                 <Route component={NotFound} />
               </Switch>
             </Container>
-          </Fragment>
+          </>
         )}
       />
-    </Fragment>
+    </>
   );
-};
+}
 
-export default withRouter(observer(App));
+export default observer(App);

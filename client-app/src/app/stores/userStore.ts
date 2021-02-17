@@ -1,49 +1,57 @@
-import { action, computed, observable, runInAction } from "mobx";
-import { IUser, IUserFormValues } from "../models/user";
-import agent from "../api/agent";
-import { RootStore } from "./rootStore";
+import { makeAutoObservable, runInAction } from "mobx";
 import { history } from "../..";
+import agent from "../api/agent";
+import { User, UserFormValues } from "../models/user";
+import { store } from "./store";
 
 export default class UserStore {
-  rootStore: RootStore;
+  user: User | null = null;
 
-  constructor(rootStore: RootStore) {
-    this.rootStore = rootStore;
+  constructor() {
+    makeAutoObservable(this);
   }
 
-  @observable user: IUser | null = null;
-
-  @computed get isLoggedIn() {
+  get isLoggedIn() {
     return !!this.user;
   }
 
-  @action login = async (values: IUserFormValues) => {
+  login = async (creds: UserFormValues) => {
     try {
-      const user = await agent.User.login(values);
-      runInAction(() => {
-        this.user = user;
-      });
-      this.rootStore.commonStore.setToken(user.token);
+      const user = await agent.Account.login(creds);
+      store.commonStore.setToken(user.token);
+      runInAction(() => (this.user = user));
       history.push("/posts");
+      store.modalStore.closeModal();
     } catch (error) {
       throw error;
     }
   };
 
-  @action getUser = async () => {
+  logout = () => {
+    store.commonStore.setToken(null);
+    window.localStorage.removeItem("jwt");
+    this.user = null;
+    history.push("/");
+  };
+
+  getUser = async () => {
     try {
-      const user = await agent.User.current();
-      runInAction(() => {
-        this.user = user;
-      });
+      const user = await agent.Account.current();
+      runInAction(() => (this.user = user));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
-  @action logout = () => {
-    this.rootStore.commonStore.setToken(null);
-    this.user = null;
-    history.push("/");
+  register = async (creds: UserFormValues) => {
+    try {
+      const user = await agent.Account.register(creds);
+      store.commonStore.setToken(user.token);
+      runInAction(() => (this.user = user));
+      history.push("/posts");
+      store.modalStore.closeModal();
+    } catch (error) {
+      throw error;
+    }
   };
 }

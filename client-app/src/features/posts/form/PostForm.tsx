@@ -1,163 +1,118 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Button, Form, Grid, Segment } from "semantic-ui-react";
-import { v4 as uuid } from "uuid";
 import { observer } from "mobx-react-lite";
-import { RouteComponentProps } from "react-router-dom";
-import { Form as FinalForm, Field } from "react-final-form";
-import { combineDateAndTime } from "../../../app/common/util/util";
-import {
-  combineValidators,
-  composeValidators,
-  hasLengthGreaterThan,
-  isRequired,
-} from "revalidate";
+import React, { useEffect, useState } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { Button, Header, Segment } from "semantic-ui-react";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+import { useStore } from "../../../app/stores/store";
+import { v4 as uuid } from "uuid";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import CustomTextInput from "../../../app/common/form/TextInput";
+import CustomTextArea from "../../../app/common/form/TextArea";
+import CustomSelectInput from "../../../app/common/form/SelectInput";
+import CustomDateInput from "../../../app/common/form/DateInput";
+import { categoryOptions } from "../../../app/common/options/categoryOptions";
+import { Post } from "../../../app/models/post";
 
-import { IPostFormValues, PostFormValues } from "../../../app/models/post";
-import TextInput from "../../../app/common/form/TextInput";
-import TextAreaInput from "../../../app/common/form/TextAreaInput";
-import SelectInput from "../../../app/common/form/SelectInput";
-import { category } from "../../../app/common/options/categoryOptions";
-import DateInput from "../../../app/common/form/DateInput";
-import { RootStoreContext } from "../../../app/stores/rootStore";
+export default observer(function PostForm() {
+  const history = useHistory();
+  const { postStore } = useStore();
+  const {
+    createPost,
+    updatePost,
+    loading,
+    loadPost,
+    loadingInitial,
+  } = postStore;
+  const { id } = useParams<{ id: string }>();
 
-const validate = combineValidators({
-  title: isRequired({ message: "The event title is required" }),
-  category: isRequired("Category"),
-  description: composeValidators(
-    isRequired("Description"),
-    hasLengthGreaterThan(4)({
-      message: "Description needs to be at least 5 characters",
-    })
-  )(),
-  city: isRequired("City"),
-  venue: isRequired("Venue"),
-  date: isRequired("Date"),
-  time: isRequired("Time"),
-});
+  const [post, setPost] = useState<Post>({
+    id: "",
+    title: "",
+    category: "",
+    description: "",
+    date: null,
+    city: "",
+    venue: "",
+  });
 
-interface DetailParams {
-  id: string;
-}
-
-const PostForm: React.FC<RouteComponentProps<DetailParams>> = ({
-  match,
-  history,
-}) => {
-  const rootStore = useContext(RootStoreContext);
-  const { createPost, editPost, submitting, loadPost } = rootStore.postStore;
-
-  const [post, setPost] = useState<IPostFormValues>(new PostFormValues());
-  const [loading, setLoading] = useState(false);
+  const validationSchema = Yup.object({
+    title: Yup.string().required("The activity title is required"),
+    description: Yup.string().required("The activity description is required"),
+    category: Yup.string().required(),
+    date: Yup.string().required("Date is required").nullable(),
+    venue: Yup.string().required(),
+    city: Yup.string().required(),
+  });
 
   useEffect(() => {
-    if (match.params.id) {
-      setLoading(true);
-      loadPost(match.params.id)
-        .then((post) => setPost(new PostFormValues(post)))
-        .finally(() => setLoading(false));
-    }
-  }, [loadPost, match.params.id]);
+    if (id) loadPost(id).then((post) => setPost(post!));
+  }, [id, loadPost]);
 
-  const handleFinalFormSubmit = (values: any) => {
-    const dateAndTime = combineDateAndTime(values.date, values.time);
-    const { date, time, ...post } = values;
-    post.date = dateAndTime;
-
-    if (!post.id) {
+  function handleFormSubmit(post: Post) {
+    if (post.id.length === 0) {
       let newPost = {
         ...post,
         id: uuid(),
       };
-      createPost(newPost);
+      createPost(newPost).then(() => history.push(`/posts/${newPost.id}`));
     } else {
-      editPost(post);
+      updatePost(post).then(() => history.push(`/posts/${post.id}`));
     }
-  };
+  }
+
+  if (loadingInitial) return <LoadingComponent content="Loading activity..." />;
 
   return (
-    <Grid>
-      <Grid.Column width={10}>
-        <Segment clearing>
-          <FinalForm
-            validate={validate}
-            initialValues={post}
-            onSubmit={handleFinalFormSubmit}
-            render={({ handleSubmit, invalid, pristine }) => (
-              <Form onSubmit={handleSubmit} loading={loading}>
-                <Field
-                  name="title"
-                  placeholder="Title"
-                  value={post.title}
-                  component={TextInput}
-                />
-                <Field
-                  name="description"
-                  placeholder="Description"
-                  rows={3}
-                  value={post.description}
-                  component={TextAreaInput}
-                />
-                <Field
-                  name="category"
-                  placeholder="Category"
-                  value={post.category}
-                  component={SelectInput}
-                  options={category}
-                />
-                <Form.Group widths="equal">
-                  <Field
-                    name="date"
-                    date={true}
-                    placeholder="Date"
-                    value={post.date}
-                    component={DateInput}
-                  />
-                  <Field
-                    name="time"
-                    time={true}
-                    placeholder="Time"
-                    value={post.time}
-                    component={DateInput}
-                  />
-                </Form.Group>
-                <Field
-                  name="city"
-                  placeholder="City"
-                  value={post.city}
-                  component={TextInput}
-                />
-                <Field
-                  name="venue"
-                  placeholder="Venue"
-                  value={post.venue}
-                  component={TextInput}
-                />
-                <Button
-                  loading={submitting}
-                  disabled={loading || invalid || pristine}
-                  floated="right"
-                  positive
-                  type="submit"
-                  content="Submit"
-                />
-                <Button
-                  onClick={
-                    post.id
-                      ? () => history.push(`/posts/${post.id}`)
-                      : () => history.push("/posts")
-                  }
-                  disabled={loading}
-                  floated="right"
-                  type="button"
-                  content="Cancel"
-                />
-              </Form>
-            )}
-          />
-        </Segment>
-      </Grid.Column>
-    </Grid>
+    <Segment clearing>
+      <Header content="Posts Details" sub color="teal" />
+      <Formik
+        validationSchema={validationSchema}
+        enableReinitialize
+        initialValues={post}
+        onSubmit={(values) => handleFormSubmit(values)}
+      >
+        {({ handleSubmit, isValid, isSubmitting, dirty }) => (
+          <Form className="ui form" onSubmit={handleSubmit} autoComplete="off">
+            <CustomTextInput name="title" placeholder="Title" />
+            <CustomTextArea
+              rows={3}
+              placeholder="Description"
+              name="description"
+            />
+            <CustomSelectInput
+              options={categoryOptions}
+              placeholder="Category"
+              name="category"
+            />
+            <CustomDateInput
+              placeholderText="Date"
+              name="date"
+              showTimeSelect
+              timeCaption="time"
+              dateFormat="MMMM d, yyyy h:mm aa"
+            />
+            <Header content="Location Details" sub color="teal" />
+            <CustomTextInput placeholder="City" name="city" />
+            <CustomTextInput placeholder="Venue" name="venue" />
+            <Button
+              disabled={isSubmitting || !dirty || !isValid}
+              loading={loading}
+              floated="right"
+              positive
+              type="submit"
+              content="Submit"
+            />
+            <Button
+              as={Link}
+              to="/posts"
+              floated="right"
+              type="button"
+              content="Cancel"
+            />
+          </Form>
+        )}
+      </Formik>
+    </Segment>
   );
-};
-
-export default observer(PostForm);
+});

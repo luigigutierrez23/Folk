@@ -1,15 +1,16 @@
-import { action, observable, reaction } from "mobx";
-import { RootStore } from "./rootStore";
+import { makeAutoObservable, reaction } from "mobx";
+import { ServerError } from "../models/serverError";
 
 export default class CommonStore {
-  rootStore: RootStore;
-  constructor(rootStore: RootStore) {
-    this.rootStore = rootStore;
+  error: ServerError | null = null;
+  token: string | null = window.localStorage.getItem("jwt");
+  appLoaded = false;
+
+  constructor() {
+    makeAutoObservable(this);
 
     reaction(
-      () => {
-        return this.token;
-      },
+      () => this.token,
       (token) => {
         if (token) {
           window.localStorage.setItem("jwt", token);
@@ -20,14 +21,15 @@ export default class CommonStore {
     );
   }
 
-  @observable token: string | null = window.localStorage.getItem("jwt");
-  @observable appLoaded = false;
+  setServerError = (error: ServerError) => {
+    this.error = error;
+  };
 
-  @action setToken = (token: string | null) => {
+  setToken = (token: string | null) => {
     this.token = token;
   };
 
-  @action setAppLoaded = () => {
+  setAppLoaded = () => {
     this.appLoaded = true;
   };
 }

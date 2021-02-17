@@ -1,10 +1,14 @@
+import { observer } from "mobx-react-lite";
 import React from "react";
 import { Segment, Grid, Icon } from "semantic-ui-react";
+import { Post } from "../../../app/models/post";
 import { format } from "date-fns";
 
-import { IPost } from "../../../app/models/post";
+interface Props {
+  post: Post;
+}
 
-const PostDetailedInfo: React.FC<{ post: IPost }> = ({ post }) => {
+export default observer(function ActivityDetailedInfo({ post }: Props) {
   return (
     <Segment.Group>
       <Segment attached="top">
@@ -23,10 +27,7 @@ const PostDetailedInfo: React.FC<{ post: IPost }> = ({ post }) => {
             <Icon name="calendar" size="large" color="teal" />
           </Grid.Column>
           <Grid.Column width={15}>
-            <span>
-              {format(post.date, "eeee do MMMM")} at{" "}
-              {format(post.date, "h:mm a")}
-            </span>
+            <span>{format(post.date!, "dd MMM yyyy h:mm aa")}</span>
           </Grid.Column>
         </Grid>
       </Segment>
@@ -44,6 +45,4 @@ const PostDetailedInfo: React.FC<{ post: IPost }> = ({ post }) => {
       </Segment>
     </Segment.Group>
   );
-};
-
-export default PostDetailedInfo;
+});

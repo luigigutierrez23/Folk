@@ -1,20 +1,20 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment } from "react";
 import { observer } from "mobx-react-lite";
-import { Item, Label } from "semantic-ui-react";
+import { Header, Item, Label } from "semantic-ui-react";
+import { useStore } from "../../../app/stores/store";
 
 import PostListItem from "./PostListItem";
-import { RootStoreContext } from "../../../app/stores/rootStore";
 
-const PostList: React.FC = () => {
-  const rootStore = useContext(RootStoreContext);
-  const { postsByDate } = rootStore.postStore;
+export default observer(function PostList() {
+  const { postStore } = useStore();
+  const { groupedPosts } = postStore;
   return (
-    <Fragment>
-      {postsByDate.map(([group, posts]) => (
+    <>
+      {groupedPosts.map(([group, posts]) => (
         <Fragment key={group}>
-          <Label size="large" color="blue">
+          <Header sub color="teal">
             {group}
-          </Label>
+          </Header>
           <Item.Group divided>
             {posts.map((post) => (
               <PostListItem key={post.id} post={post} />
@@ -22,8 +22,6 @@ const PostList: React.FC = () => {
           </Item.Group>
         </Fragment>
       ))}
-    </Fragment>
+    </>
   );
-};
-
-export default observer(PostList);
+});

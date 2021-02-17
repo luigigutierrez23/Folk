@@ -3,9 +3,13 @@ import { Link } from "react-router-dom";
 import { Button, Icon, Item, Segment } from "semantic-ui-react";
 import { format } from "date-fns";
 
-import { IPost } from "../../../app/models/post";
+import { Post } from "../../../app/models/post";
 
-const PostListItem: React.FC<{ post: IPost }> = ({ post }) => {
+interface Props {
+  post: Post;
+}
+
+export default function ActivityListItem({ post }: Props) {
   return (
     <Segment.Group>
       <Segment>
@@ -13,15 +17,19 @@ const PostListItem: React.FC<{ post: IPost }> = ({ post }) => {
           <Item key={post.id}>
             <Item.Image size="tiny" circular src="/assets/user.png" />
             <Item.Content>
-              <Item.Header as="a">{post.title}</Item.Header>
+              <Item.Header as={Link} to={`/posts/${post.id}`}>
+                {post.title}
+              </Item.Header>
               <Item.Description>Hosted by Luigi</Item.Description>
             </Item.Content>
           </Item>
         </Item.Group>
       </Segment>
       <Segment>
-        <Icon name="clock" /> {format(post.date, "h:mm a")}
-        <Icon name="marker" /> {post.venue},{post.city}
+        <span>
+          <Icon name="clock" /> {format(post.date!, "dd MMM yyyy h:mm aa")}
+          <Icon name="marker" /> {post.venue}
+        </span>
       </Segment>
       <Segment secondary>Attendes will go here</Segment>
       <Segment clearing>
@@ -31,11 +39,9 @@ const PostListItem: React.FC<{ post: IPost }> = ({ post }) => {
           to={`/posts/${post.id}`}
           floated="right"
           content="View"
-          color="blue"
-        ></Button>
+          color="teal"
+        />
       </Segment>
     </Segment.Group>
   );
-};
-
-export default PostListItem;
+}

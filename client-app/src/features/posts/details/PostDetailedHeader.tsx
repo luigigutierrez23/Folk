@@ -1,16 +1,15 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Header, Image, Item, Segment } from "semantic-ui-react";
+import { Button, Header, Item, Segment, Image } from "semantic-ui-react";
+import { Post } from "../../../app/models/post";
 import { format } from "date-fns";
 
-import { IPost } from "../../../app/models/post";
-
-const postImageStyle = {
+const activityImageStyle = {
   filter: "brightness(30%)",
 };
 
-const postImageTextStyle = {
+const activityImageTextStyle = {
   position: "absolute",
   bottom: "5%",
   left: "5%",
@@ -19,16 +18,20 @@ const postImageTextStyle = {
   color: "white",
 };
 
-const PostDetailedHeader: React.FC<{ post: IPost }> = ({ post }) => {
+interface Props {
+  post: Post;
+}
+
+export default observer(function ActivityDetailedHeader({ post }: Props) {
   return (
     <Segment.Group>
       <Segment basic attached="top" style={{ padding: "0" }}>
         <Image
           src={`/assets/categoryImages/${post.category}.jpg`}
           fluid
-          style={postImageStyle}
+          style={activityImageStyle}
         />
-        <Segment basic style={postImageTextStyle}>
+        <Segment style={activityImageTextStyle} basic>
           <Item.Group>
             <Item>
               <Item.Content>
@@ -37,7 +40,7 @@ const PostDetailedHeader: React.FC<{ post: IPost }> = ({ post }) => {
                   content={post.title}
                   style={{ color: "white" }}
                 />
-                <p>{format(post.date, "eeee do MMMM")}</p>
+                <p>{format(post.date!, "dd MMM yyyy")}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>
@@ -60,6 +63,4 @@ const PostDetailedHeader: React.FC<{ post: IPost }> = ({ post }) => {
       </Segment>
     </Segment.Group>
   );
-};
-
-export default observer(PostDetailedHeader);
+});

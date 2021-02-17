@@ -1,70 +1,55 @@
-import { FORM_ERROR } from "final-form";
-import React, { useContext } from "react";
-import { Form as FinalForm, Field } from "react-final-form";
-import { combineValidators, isRequired } from "revalidate";
-import { Button, Form, Header, Label } from "semantic-ui-react";
-import ErrorMessage from "../../app/common/form/ErrorMessage";
+import { ErrorMessage, Form, Formik } from "formik";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import { Button, Header, Label } from "semantic-ui-react";
+import CustomTextInput from "../../app/common/form/TextInput";
+import { useStore } from "../../app/stores/store";
 
-import TextInput from "../../app/common/form/TextInput";
-import { IUserFormValues } from "../../app/models/user";
-import { RootStoreContext } from "../../app/stores/rootStore";
-
-const validate = combineValidators({
-  email: isRequired("email"),
-  password: isRequired("password"),
-});
-
-const LoginForm = () => {
-  const rootStore = useContext(RootStoreContext);
-  const { login } = rootStore.userStore;
-
+export default observer(function LoginForm() {
+  const { userStore } = useStore();
   return (
-    <FinalForm
-      onSubmit={(values: IUserFormValues) =>
-        login(values).catch((error) => ({
-          [FORM_ERROR]: error,
-        }))
+    <Formik
+      initialValues={{ email: "", password: "", error: null }}
+      onSubmit={(values, { setErrors }) =>
+        userStore
+          .login(values)
+          .catch((error) => setErrors({ error: "Invalid email or password" }))
       }
-      validate={validate}
-      render={({
-        handleSubmit,
-        submitting,
-        submitError,
-        invalid,
-        pristine,
-        dirtySinceLastSubmit,
-      }) => (
-        <Form onSubmit={handleSubmit} error>
+    >
+      {({ handleSubmit, isSubmitting, errors }) => (
+        <Form className="ui form" onSubmit={handleSubmit} autoComplete="off">
           <Header
             as="h2"
             content="Login to Folk"
             color="teal"
             textAlign="center"
           />
-          <Field name="email" component={TextInput} placeholder="Email" />
-          <Field
+          <CustomTextInput name="email" placeholder="Email" />
+          <CustomTextInput
             name="password"
-            component={TextInput}
             placeholder="Password"
             type="password"
           />
-          {submitError && !dirtySinceLastSubmit && (
-            <ErrorMessage
-              error={submitError}
-              text="Invalid email or password"
-            />
-          )}
+          <ErrorMessage
+            name="error"
+            render={() => (
+              <Label
+                style={{ marginBottom: 10 }}
+                basic
+                color="red"
+                content={errors.error}
+              />
+            )}
+          />
           <Button
-            disabled={(invalid && !dirtySinceLastSubmit) || pristine}
-            loading={submitting}
-            color="teal"
+            loading={isSubmitting}
+            positive
             content="Login"
+            type="submit"
             fluid
           />
         </Form>
       )}
-    />
+    </Formik>
   );
-};
-
-export default LoginForm;
+});

@@ -1,40 +1,23 @@
 import React from "react";
-import { FieldRenderProps } from "react-final-form";
-import { Form, FormFieldProps, Label } from "semantic-ui-react";
-import { DateTimePicker } from "react-widgets";
+import { Form, Label } from "semantic-ui-react";
+import { useField } from "formik";
+import DateTimePicker, { ReactDatePickerProps } from "react-datepicker";
 
-interface IProps
-  extends FieldRenderProps<Date, HTMLInputElement>,
-    FormFieldProps {}
-
-const DateInput: React.FC<IProps> = ({
-  input,
-  width,
-  placeholder,
-  date = false,
-  time = false,
-  meta: { touched, error },
-  ...rest
-}) => {
+export default function CustomDateInput(props: Partial<ReactDatePickerProps>) {
+  const [field, meta, helpers] = useField(props.name!);
   return (
-    <Form.Field error={touched && !!error} width={width}>
+    <Form.Field error={meta.touched && !!meta.error}>
       <DateTimePicker
-        placeholder={placeholder}
-        value={input.value || null}
-        onBlur={input.onBlur}
-        onChange={input.onChange}
-        onKeyDown={(e: any) => e.preventDefault()}
-        date={date}
-        time={time}
-        {...rest}
+        {...field}
+        {...props}
+        selected={(field.value && new Date(field.value)) || null}
+        onChange={(value) => helpers.setValue(value)}
       />
-      {touched && error && (
+      {meta.touched && meta.error ? (
         <Label basic color="red">
-          {error}
+          {meta.error}
         </Label>
-      )}
+      ) : null}
     </Form.Field>
   );
-};
-
-export default DateInput;
+}

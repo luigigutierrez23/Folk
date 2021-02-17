@@ -1,18 +1,19 @@
 import React, { useContext, useEffect } from "react";
 import { Grid } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
+import { useStore } from "../../../app/stores/store";
 
 import PostList from "./PostList";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
-import { RootStoreContext } from "../../../app/stores/rootStore";
+import PostFilters from "./PostFilters";
 
-const PostDashboard: React.FC = () => {
-  const rootStore = useContext(RootStoreContext);
-  const { loadPosts, loadingInitial } = rootStore.postStore;
+export default observer(function PostDashboard() {
+  const { postStore } = useStore();
+  const { loadPosts, postRegistry, loadingInitial } = postStore;
 
   useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
+    if (postRegistry.size <= 1) loadPosts();
+  }, [postRegistry.size, loadPosts]);
 
   if (loadingInitial)
     return <LoadingComponent inverted={true} content="Loading posts..." />;
@@ -22,10 +23,8 @@ const PostDashboard: React.FC = () => {
         <PostList />
       </Grid.Column>
       <Grid.Column width={6}>
-        <h2>Post Filters</h2>
+        <PostFilters />
       </Grid.Column>
     </Grid>
   );
-};
-
-export default observer(PostDashboard);
+});
