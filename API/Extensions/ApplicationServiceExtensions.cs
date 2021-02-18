@@ -14,23 +14,6 @@ namespace API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, 
         IConfiguration configuration)
         {
-            services.AddCors(opts =>
-            {
-                opts.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins(new string[] {"http://localhost:3000", "test"});
-                });
-            });
-            
-            services.AddMediatR(typeof(List.Handler).Assembly);
-            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
-
-            //Db context SQlite
-            services.AddDbContext<DataContext>(opt =>
-            {
-                opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
-            });
-            
 
             //Allow Swagger
             services.AddSwaggerGen(c =>
@@ -38,10 +21,27 @@ namespace API.Extensions
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
 
-            services.AddSwaggerGen(options =>
+            //Db context SQlite
+            services.AddDbContext<DataContext>(opt =>
             {
-                options.CustomSchemaIds(type => type.ToString());
+                opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddCors(opts =>
+            {
+                opts.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins(new string[] {"http://localhost:3000", "test"});
+                });
+            });
+
+            // services.AddSwaggerGen(options =>
+            // {
+            //     options.CustomSchemaIds(type => type.ToString());
+            // });
+
+            services.AddMediatR(typeof(List.Handler).Assembly);
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
             return services;
         }

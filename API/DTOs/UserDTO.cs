@@ -1,6 +1,6 @@
-namespace Application.User
+namespace API.DTOs
 {
-    public class User
+    public class UserDTO
     {
         public string DisplayName { get; set; }
         public string Token { get; set; }
