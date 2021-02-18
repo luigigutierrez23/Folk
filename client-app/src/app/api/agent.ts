@@ -28,9 +28,14 @@ axios.interceptors.response.use(
 
     switch (status) {
       case 400:
-        if (config.method === "get" && data.errors.hasOwnProperty("id")) {
+        if (
+          config.method === "get" &&
+          data.errors &&
+          data.errors.hasOwnProperty("id")
+        ) {
           history.push("/not-found");
         }
+
         if (data.errors) {
           const modalStateErrors = [];
           for (const key in data.errors) {

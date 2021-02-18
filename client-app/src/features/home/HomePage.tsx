@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Container, Header, Image, Segment } from "semantic-ui-react";
@@ -5,7 +6,7 @@ import { useStore } from "../../app/stores/store";
 import LoginForm from "../user/LoginForm";
 import RegisterForm from "../user/RegisterForm";
 
-const HomePage = () => {
+export default observer(function HomePage() {
   const { userStore, modalStore } = useStore();
   return (
     <Segment inverted textAlign="center" vertical className="masthead">
@@ -48,6 +49,4 @@ const HomePage = () => {
       </Container>
     </Segment>
   );
-};
-
-export default HomePage;
+});
