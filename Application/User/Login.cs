@@ -1,7 +1,5 @@
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Errors;
 using Application.Interfaces;
 using Domain;
 using FluentValidation;
@@ -47,7 +45,7 @@ namespace Application.User
 
                 if (user == null)
                 {
-                    throw new RestException(HttpStatusCode.Unauthorized);
+                    throw new System.Exception("asd");
                 }
 
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
@@ -64,7 +62,7 @@ namespace Application.User
                     };
                 }
 
-                throw new RestException(HttpStatusCode.Unauthorized);
+                throw new System.Exception("asd");
             }
         }
     }

@@ -1,8 +1,6 @@
 using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Errors;
 using Application.Interfaces;
 using Application.Validators;
 using Domain;
@@ -51,12 +49,12 @@ namespace Application.User
             {
                 if(await _context.Users.AnyAsync(x => x.Email == request.Email))
                 {
-                    throw new RestException(HttpStatusCode.BadRequest, new {Email = "Email already exists"});
+                    throw new System.Exception("asd");
                 }
 
                 if(await _context.Users.AnyAsync(x => x.UserName == request.UserName))
                 {
-                    throw new RestException(HttpStatusCode.BadRequest, new {UserName = "Username already exists"});
+                    throw new System.Exception("asd");
                 }
 
                 var user = new AppUser

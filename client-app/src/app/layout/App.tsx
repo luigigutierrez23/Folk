@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import { Container } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import { Route, Switch, useLocation } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import { useStore } from "../stores/store";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 import NavBar from "./NavBar";
 import PostDashboard from "../../features/posts/dashboard/PostDashboard";

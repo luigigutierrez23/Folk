@@ -1,12 +1,11 @@
 ﻿using Application.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    public class UserController : BaseController
+    public class UserController : BaseApiController
     {
         [AllowAnonymous]
         [HttpPost("login")]
@@ -27,6 +26,5 @@ namespace API.Controllers
         {
             return await Mediator.Send(new CurrentUser.Query());
         }
-
     }
 }
