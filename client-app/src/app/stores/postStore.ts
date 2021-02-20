@@ -1,8 +1,10 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { format } from "date-fns";
-import { Post } from "../models/post";
+import { Post, PostFormValues } from "../models/post";
 
 import agent from "../api/agent";
+import { store } from "./store";
+import { Profile } from "../models/profile";
 
 export default class PostStore {
   postRegistry = new Map<string, Post>();
@@ -69,39 +71,35 @@ export default class PostStore {
     }
   };
 
-  createPost = async (post: Post) => {
-    this.loading = true;
+  createPost = async (post: PostFormValues) => {
+    const user = store.userStore.user;
+    const attendee = new Profile(user!);
     try {
       await agent.Posts.create(post);
+      const newPost = new Post(post);
+      newPost.hostUsername = user!.username;
+      newPost.attendees = [attendee];
+      this.setPost(newPost);
       runInAction(() => {
-        this.postRegistry.set(post.id, post);
-        this.selectedPost = post;
-        this.editMode = false;
-        this.loading = false;
+        this.selectedPost = newPost;
       });
     } catch (err) {
       console.log(err);
-      runInAction(() => {
-        this.loading = false;
-      });
     }
   };
 
-  updatePost = async (post: Post) => {
-    this.loading = true;
+  updatePost = async (post: PostFormValues) => {
     try {
       await agent.Posts.update(post);
       runInAction(() => {
-        this.postRegistry.set(post.id, post);
-        this.selectedPost = post;
-        this.editMode = false;
-        this.loading = false;
+        if (post.id) {
+          let updatedPost = { ...this.getPost(post.id), ...post };
+          this.postRegistry.set(post.id, updatedPost as Post);
+          this.selectedPost = updatedPost as Post;
+        }
       });
     } catch (err) {
       console.error(err);
-      runInAction(() => {
-        this.loading = false;
-      });
     }
   };
 
@@ -121,7 +119,58 @@ export default class PostStore {
     }
   };
 
+  updateAttendance = async () => {
+    const user = store.userStore.user;
+    this.loading = true;
+    try {
+      await agent.Posts.attend(this.selectedPost!.id);
+      runInAction(() => {
+        if (this.selectedPost?.isGoing) {
+          this.selectedPost.attendees = this.selectedPost.attendees?.filter(
+            (a) => a.username !== user?.username
+          );
+          this.selectedPost.isGoing = false;
+        } else {
+          const attendee = new Profile(user!);
+          this.selectedPost?.attendees?.push(attendee);
+          this.selectedPost!.isGoing = true;
+        }
+        this.postRegistry.set(this.selectedPost!.id, this.selectedPost!);
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
+
+  cancelPostToggle = async () => {
+    this.loading = true;
+    try {
+      await agent.Posts.attend(this.selectedPost!.id);
+      runInAction(() => {
+        this.selectedPost!.isCancelled = !this.selectedPost?.isCancelled;
+        this.postRegistry.set(this.selectedPost!.id, this.selectedPost!);
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
+
   private setPost = (post: Post) => {
+    const user = store.userStore.user;
+    if (user) {
+      post.isGoing = post.attendees!.some((a) => a.username === user.username);
+      post.isHost = post.hostUsername === user.username;
+      post.host = post.attendees?.find((x) => x.username === post.hostUsername);
+    }
+
     post.date = new Date(post.date!);
     this.postRegistry.set(post.id, post);
   };

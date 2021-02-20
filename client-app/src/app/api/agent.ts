@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { Post } from "../models/post";
+import { Post, PostFormValues } from "../models/post";
 import { history } from "../..";
 import { toast } from "react-toastify";
 import { User, UserFormValues } from "../models/user";
@@ -76,9 +76,11 @@ const requests = {
 const Posts = {
   list: (): Promise<Post[]> => requests.get<Post[]>("/posts"),
   details: (id: string) => requests.get<Post>(`/posts/${id}`),
-  create: (post: Post) => requests.post<void>("/posts", post),
-  update: (post: Post) => requests.put<void>(`posts/${post.id}`, post),
+  create: (post: PostFormValues) => requests.post<void>("/posts", post),
+  update: (post: PostFormValues) =>
+    requests.put<void>(`posts/${post.id}`, post),
   delete: (id: string) => requests.del<void>(`posts/${id}`),
+  attend: (id: string) => requests.post<void>(`posts/${id}/attend`, {}),
 };
 
 const Account = {

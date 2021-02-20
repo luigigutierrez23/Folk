@@ -29,7 +29,7 @@ export default observer(function PostDetails() {
         <PostDetailedChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <PostDetailedSideBar />
+        <PostDetailedSideBar post={post} />
       </Grid.Column>
     </Grid>
   );
