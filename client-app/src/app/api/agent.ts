@@ -4,6 +4,7 @@ import { history } from "../..";
 import { toast } from "react-toastify";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
+import { Photo, Profile } from "../models/profile";
 
 const sleep = (ms: number) => (response: AxiosResponse) =>
   new Promise<AxiosResponse>((resolve) =>
@@ -90,9 +91,23 @@ const Account = {
     requests.post<User>("/account/register", user),
 };
 
+const Profiles = {
+  get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+  uploadPhoto: (file: Blob) => {
+    let formData = new FormData();
+    formData.append("File", file);
+    return axios.post<Photo>("photos", formData, {
+      headers: { "Content-type": "multipart/form-data" },
+    });
+  },
+  setMainPhoto: (id: string) => requests.post(`/photos/${id}/set-main`, {}),
+  deletePhoto: (id: string) => requests.del(`/photos/${id}`),
+};
+
 const agent = {
   Posts,
   Account,
+  Profiles,
 };
 
 export default agent;

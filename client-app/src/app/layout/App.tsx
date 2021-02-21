@@ -17,6 +17,7 @@ import LoginForm from "../../features/user/LoginForm";
 import LoadingComponent from "./LoadingComponent";
 import ModalContainer from "../common/modals/ModalContainer";
 import TestErrors from "../../features/errors/TestError";
+import ProfilePage from "../../features/profiles/ProfilePage";
 
 function App() {
   const location = useLocation();
@@ -52,6 +53,7 @@ function App() {
                   path={["/create-post", "/manage/:id"]}
                   component={PostForm}
                 />
+                <Route path={"/profiles/:username"} component={ProfilePage} />
                 <Route path="/errors" component={TestErrors} />
                 <Route path="/server-error" component={ServerError} />
                 <Route path="/login" component={LoginForm} />
