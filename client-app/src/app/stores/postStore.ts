@@ -182,4 +182,8 @@ export default class PostStore {
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state;
   };
+
+  clearSelectedPost = () => {
+    this.selectedPost = undefined;
+  };
 }

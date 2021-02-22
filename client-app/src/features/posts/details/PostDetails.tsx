@@ -12,12 +12,18 @@ import PostDetailedSideBar from "./PostDetailedSideBar";
 
 export default observer(function PostDetails() {
   const { postStore } = useStore();
-  const { selectedPost: post, loadPost, loadingInitial } = postStore;
+  const {
+    selectedPost: post,
+    loadPost,
+    loadingInitial,
+    clearSelectedPost,
+  } = postStore;
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     if (id) loadPost(id);
-  }, [id, loadPost]);
+    return () => clearSelectedPost();
+  }, [id, loadPost, clearSelectedPost]);
 
   if (loadingInitial || !post) return <LoadingComponent />;
 
@@ -26,7 +32,7 @@ export default observer(function PostDetails() {
       <Grid.Column width={10}>
         <PostDetailedHeader post={post} />
         <PostDetailedInfo post={post} />
-        <PostDetailedChat />
+        <PostDetailedChat postId={post.id} />
       </Grid.Column>
       <Grid.Column width={6}>
         <PostDetailedSideBar post={post} />
