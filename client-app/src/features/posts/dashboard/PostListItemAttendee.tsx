@@ -10,6 +10,10 @@ interface Props {
 }
 
 export default observer(function PostListItemAttendee({ attendees }: Props) {
+  const styles = {
+    borderColor: "orange",
+    borderWidth: 2,
+  };
   return (
     <List horizontal>
       {attendees.map((a) => (
@@ -22,7 +26,13 @@ export default observer(function PostListItemAttendee({ attendees }: Props) {
               as={Link}
               to={`/profiles/${a.username}`}
             >
-              <Image size="mini" circular src={a.image || "/assets/user.png"} />
+              <Image
+                bordered
+                style={a.following ? styles : null}
+                size="mini"
+                circular
+                src={a.image || "/assets/user.png"}
+              />
             </List.Item>
           }
         >
