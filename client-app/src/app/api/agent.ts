@@ -4,7 +4,8 @@ import { history } from "../..";
 import { toast } from "react-toastify";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
-import { Photo, Profile } from "../models/profile";
+import { Photo, Profile, UserPost } from "../models/profile";
+import { PaginatedResult } from "../models/pagination";
 
 const sleep = (ms: number) => (response: AxiosResponse) =>
   new Promise<AxiosResponse>((resolve) =>
@@ -22,6 +23,14 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use(
   async (response) => {
     await sleep(1000);
+    const pagination = response.headers["pagination"];
+    if (pagination) {
+      response.data = new PaginatedResult(
+        response.data,
+        JSON.parse(pagination)
+      );
+      return response as AxiosResponse<PaginatedResult<any>>;
+    }
     return response;
   },
   (error: AxiosError) => {
@@ -75,7 +84,10 @@ const requests = {
 };
 
 const Posts = {
-  list: (): Promise<Post[]> => requests.get<Post[]>("/posts"),
+  list: (params: URLSearchParams) =>
+    axios
+      .get<PaginatedResult<Post[]>>("/posts", { params })
+      .then(responseBody),
   details: (id: string) => requests.get<Post>(`/posts/${id}`),
   create: (post: PostFormValues) => requests.post<void>("/posts", post),
   update: (post: PostFormValues) =>
@@ -108,6 +120,10 @@ const Profiles = {
     requests.post(`/follow/${username}`, {}),
   listFollowings: (username: string, predicate: string) =>
     requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`),
+  listPosts: (username: string, predicate: string) =>
+    requests.get<UserPost[]>(
+      `/profiles/${username}/posts?predicate=${predicate}`
+    ),
 };
 
 const agent = {
