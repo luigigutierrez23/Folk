@@ -54,7 +54,12 @@ namespace API
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
                 .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com"))
-                .ScriptSources(s => s.Self().CustomSources("sha256-V0TudT2iElMAGe6mGFDQa1s/YJ+hFDPFvAcLnYYEcSA="))
+                .ScriptSources(s => s.Self()
+                    .CustomSources(
+                        "sha256-0aldtFvXGaO4rLYjFWef78J6Wa3w+BYWHT0NKQg5od0=",
+                        "sha256-7z3+LAX0mHkYYD8jnzPIhTAVKmE7cPVTYVAT9sxJmO4=",
+                        "sha256-Kt1MmTDqHUBIy1kiS2Duhy5D1kkAxDSB+KB0fPDuSYo="
+                    ))
             );
 
 
@@ -65,8 +70,9 @@ namespace API
             }
             else
             {
-                app.Use(async (context, next) => {
-                    context.Response.Headers.Add("Strict-Transport-Security", "max-age=3153600");
+                app.Use(async (context, next) => 
+                {
+                    context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
                     await next.Invoke();
                 });
             }
