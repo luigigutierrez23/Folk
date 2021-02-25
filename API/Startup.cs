@@ -49,16 +49,31 @@ namespace API
             app.UseXfo(opt => opt.Deny());
             app.UseCsp(opt => opt
                 .BlockAllMixedContent()
-                .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com"))
-                .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))
+                .StyleSources(s => s.Self()
+                    .CustomSources(
+                        "https://fonts.googleapis.com",
+                        "sha256-wkAU1AW/h8YFx0XlzvpTllAKnFEO2tw8aKErs5a26LY="
+                ))
+                .FontSources(s => s.Self()
+                    .CustomSources(
+                        "https://fonts.gstatic.com",
+                        "data:"
+                    ))
                 .FormActions(s => s.Self())
                 .FrameAncestors(s => s.Self())
-                .ImageSources(s => s.Self().CustomSources("https://res.cloudinary.com"))
+                .ImageSources(s => s.Self()
+                    .CustomSources(
+                        "https://res.cloudinary.com",
+                        "data:",
+                        "blob:"
+                ))
                 .ScriptSources(s => s.Self()
                     .CustomSources(
                         "sha256-0aldtFvXGaO4rLYjFWef78J6Wa3w+BYWHT0NKQg5od0=",
+                        "sha256-QnTujQNM6zz5a+vXzOGWBMe19H3eroBwYX6Zf8Zrm2U=",
                         "sha256-7z3+LAX0mHkYYD8jnzPIhTAVKmE7cPVTYVAT9sxJmO4=",
-                        "sha256-Kt1MmTDqHUBIy1kiS2Duhy5D1kkAxDSB+KB0fPDuSYo="
+                        "sha256-CzYN5MMT8wA9fbIe+4hC2BQ8qaszoPPdWMDLwuEJDcM=",
+                        "sha256-Tui7QoFlnLXkJCSl1/JvEZdIXTmBttnWNxzJpXomQjg="
                     ))
             );
 
