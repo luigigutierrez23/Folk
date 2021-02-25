@@ -8,6 +8,7 @@ import RegisterForm from "../user/RegisterForm";
 
 export default observer(function HomePage() {
   const { userStore, modalStore } = useStore();
+
   return (
     <Segment inverted textAlign="center" vertical className="masthead">
       <Container text>

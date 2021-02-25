@@ -23,8 +23,8 @@ export default observer(function PostForm() {
   const [post, setPost] = useState<PostFormValues>(new PostFormValues());
 
   const validationSchema = Yup.object({
-    title: Yup.string().required("The activity title is required"),
-    description: Yup.string().required("The activity description is required"),
+    title: Yup.string().required("The post title is required"),
+    description: Yup.string().required("The post description is required"),
     category: Yup.string().required(),
     date: Yup.string().required("Date is required").nullable(),
     venue: Yup.string().required(),
