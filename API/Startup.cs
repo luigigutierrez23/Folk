@@ -52,7 +52,8 @@ namespace API
                 .StyleSources(s => s.Self()
                     .CustomSources(
                         "https://fonts.googleapis.com",
-                        "sha256-wkAU1AW/h8YFx0XlzvpTllAKnFEO2tw8aKErs5a26LY="
+                        "sha256-wkAU1AW/h8YFx0XlzvpTllAKnFEO2tw8aKErs5a26LY=",
+                        "sha256-2aahydUs+he2AO0g7YZuG67RGvfE9VXGbycVgIwMnBI="
                 ))
                 .FontSources(s => s.Self()
                     .CustomSources(
@@ -64,16 +65,23 @@ namespace API
                 .ImageSources(s => s.Self()
                     .CustomSources(
                         "https://res.cloudinary.com",
+                        "https://www.facebook.com",
+                        "https://platform-lookaside.fbsbx.com",
                         "data:",
                         "blob:"
                 ))
                 .ScriptSources(s => s.Self()
                     .CustomSources(
                         "sha256-0aldtFvXGaO4rLYjFWef78J6Wa3w+BYWHT0NKQg5od0=",
+                        "https://connect.facebook.net",
                         "sha256-QnTujQNM6zz5a+vXzOGWBMe19H3eroBwYX6Zf8Zrm2U=",
                         "sha256-7z3+LAX0mHkYYD8jnzPIhTAVKmE7cPVTYVAT9sxJmO4=",
                         "sha256-CzYN5MMT8wA9fbIe+4hC2BQ8qaszoPPdWMDLwuEJDcM=",
-                        "sha256-Tui7QoFlnLXkJCSl1/JvEZdIXTmBttnWNxzJpXomQjg="
+                        "sha256-Tui7QoFlnLXkJCSl1/JvEZdIXTmBttnWNxzJpXomQjg=",
+                        "sha256-Gt3BPuPmOw7RP8QnhA34VChGZH90T/c7EvrHqoyZ35o=",
+                        "sha256-yAuGcVFwPzeOfLAVg5D5Dl5ekhtC6Ppc3Q76vCarbxA=",
+                        "sha256-0tOHBvatcojG9GVHxHZXbbL7Ey5JtaCQxQ0Td6ZaR0w=",
+                        "sha256-IkJn6drnSmEDEqksTEX+Qwazt4wmUyuUCzG7RgSAWMs="
                     ))
             );
 
