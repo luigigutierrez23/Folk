@@ -82,7 +82,8 @@ namespace API
                         "sha256-yAuGcVFwPzeOfLAVg5D5Dl5ekhtC6Ppc3Q76vCarbxA=",
                         "sha256-0tOHBvatcojG9GVHxHZXbbL7Ey5JtaCQxQ0Td6ZaR0w=",
                         "sha256-IkJn6drnSmEDEqksTEX+Qwazt4wmUyuUCzG7RgSAWMs=",
-                        "sha256-0Di1yB9BinAEcbk++K2WtM3w+bCiY5Y18wU8FNgjmMw="
+                        "sha256-0Di1yB9BinAEcbk++K2WtM3w+bCiY5Y18wU8FNgjmMw=",
+                        "sha256-7NuMu7xId3pTP1ZVFRAF+DKLK2dTDCIfHvQXudvNcEQ="
                     ))
             );
 
