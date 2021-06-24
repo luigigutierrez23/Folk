@@ -32,7 +32,7 @@ export default observer(function HomePage() {
           <>
             <Header as="h2" inverted content={`Welcome to Folk`} />
             <Button as={Link} to="/posts" size="huge" inverted>
-              Go to posts!
+              Go to postss!
             </Button>
           </>
         ) : (
